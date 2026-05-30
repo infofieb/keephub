@@ -4,7 +4,7 @@ Deployment notes — Render + Netlify
 This repository is set up to deploy the backend on Render and the frontend on Netlify.
 
 Render (backend)
-- The `render.yaml` file declares a web service named `keephub-backend` using branch `deploy-clean`.
+- The `render.yaml` file declares a web service named `keephub-backend` using branch `main`.
 - After adding the repository to Render, open the service settings and populate the environment variables with your Aiven credentials:
   - `DB_HOST` (e.g. keephub-iaedesenvolvimento-4568.l.aivencloud.com)
   - `DB_PORT` (e.g. 20023)
@@ -18,10 +18,10 @@ Notes: do NOT store secrets in the repo. Leave values empty in `render.yaml` and
 Netlify (frontend)
 - `netlify.toml` is configured to publish the `frontend` folder.
 - `_redirects` in `frontend/_redirects` proxies `/api/*` to the Render backend.
-- Ensure the Netlify site is set to deploy from branch `deploy-clean` (or change branch in Netlify settings).
+- Ensure the Netlify site is set to deploy from branch `main` (or change branch in Netlify settings).
 
 Workflow
-1. Push code to `deploy-clean`.
+1. Push code to `main`.
 2. Render will auto-deploy the backend from `backend/` (see render.yaml). Fill env vars in Render dashboard first.
 3. Netlify will auto-deploy the frontend from `frontend/` (ensure branch matches).
 

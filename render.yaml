@@ -2,22 +2,9 @@ services:
   - type: web
     name: keephub-backend
     env: node
-    branch: deploy-clean
+    branch: main
     plan: free
     root: backend
     buildCommand: npm install
     startCommand: npm start
     autoDeploy: true
-    envVars:
-      - key: DB_HOST
-        value: ""
-      - key: DB_PORT
-        value: ""
-      - key: DB_USER
-        value: ""
-      - key: DB_PASS
-        value: ""
-      - key: DB_NAME
-        value: ""
-      - key: DB_SSL
-        value: ""
