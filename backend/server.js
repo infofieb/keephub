@@ -98,6 +98,25 @@ checkDatabaseConnection();
 // CONTROLLERS (Rotas da API)
 // ==========================================
 
+// Rota de Diagnóstico Seguro para Produção
+app.get('/api/health', async (req, res) => {
+    const config = {
+        host: process.env.DB_HOST ? 'Definido (finaliza com ' + process.env.DB_HOST.slice(-15) + ')' : 'Indefinido',
+        port: process.env.DB_PORT || 'Indefinido',
+        user: process.env.DB_USER || 'Indefinido',
+        database: process.env.DB_NAME || 'Indefinido',
+        ssl: process.env.DB_SSL || 'Indefinido',
+        node_env: process.env.NODE_ENV || 'Indefinido',
+    };
+    
+    try {
+        await db.query('SELECT 1');
+        res.json({ status: 'OK', config, message: 'Base de dados conectada com sucesso!' });
+    } catch (erro) {
+        res.status(500).json({ status: 'ERROR', config, error: erro.message });
+    }
+});
+
 // Rota unificada para carregar tudo (Leitura - READ)
 app.get('/api/sync', async (req, res) => {
     try {
