@@ -84,6 +84,10 @@ app.post('/api/pets', async (req, res) => {
 
 // Iniciar o Servidor
 const PORT = process.env.PORT || 3000;
+// Redireciona a raiz para o frontend Netlify
+app.get('/', (req, res) => {
+    res.redirect('https://keephub.netlify.app');
+});
 app.listen(PORT, () => {
     console.log(`Servidor MVC rodando na porta http://localhost:${PORT}`);
 });
