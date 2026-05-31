@@ -62,6 +62,17 @@ const checkDatabaseConnection = async () => {
             }
         };
 
+        const adicionarColunaSeNaoExiste = async (tableName, colName, colDef) => {
+            const [colunas] = await db.query(`
+                SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS 
+                WHERE TABLE_NAME = ? AND COLUMN_NAME = ? AND TABLE_SCHEMA = DATABASE()
+            `, [tableName, colName]);
+            if (colunas.length === 0) {
+                console.log(`Adicionando coluna ${colName} na tabela ${tableName}...`);
+                await db.query(`ALTER TABLE ${tableName} ADD COLUMN ${colName} ${colDef}`);
+            }
+        };
+
         // 2. Criar tabelas principais com suporte a usuario_id
         await db.query(`
             CREATE TABLE IF NOT EXISTS financas (
@@ -76,6 +87,8 @@ const checkDatabaseConnection = async () => {
             )
         `);
         await adicionarUsuarioIdSeNaoExiste('financas');
+        await adicionarColunaSeNaoExiste('financas', 'status', "ENUM('pago', 'pendente') DEFAULT 'pago'");
+        await adicionarColunaSeNaoExiste('financas', 'data_vencimento', "DATE");
 
         await db.query(`
             CREATE TABLE IF NOT EXISTS metas (
@@ -315,12 +328,60 @@ app.get('/api/sync', requireAuth, async (req, res) => {
 // Adicionar Finança (Criação - CREATE)
 app.post('/api/financas', requireAuth, async (req, res) => {
     try {
-        const { desc, valor, tipo, origem } = req.body;
-        await db.query('INSERT INTO financas (descricao, valor, tipo, origem, usuario_id) VALUES (?, ?, ?, ?, ?)', [desc, valor, tipo, origem, req.userId]);
+        const { desc, valor, tipo, origem, status = 'pago', data_vencimento = null } = req.body;
+        await db.query(
+            'INSERT INTO financas (descricao, valor, tipo, origem, status, data_vencimento, usuario_id) VALUES (?, ?, ?, ?, ?, ?, ?)', 
+            [desc, valor, tipo, origem, status, data_vencimento, req.userId]
+        );
         res.json({ sucesso: true });
     } catch (erro) {
         console.error('DB error on /api/financas:', erro);
         res.status(500).json({ erro: 'Erro ao inserir a finança', detalhes: erro.message });
+    }
+});
+
+// Editar Finança (Atualização - UPDATE)
+app.put('/api/financas/:id', requireAuth, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { desc, valor, tipo, status, data_vencimento } = req.body;
+        await db.query(
+            'UPDATE financas SET descricao = ?, valor = ?, tipo = ?, status = ?, data_vencimento = ? WHERE id = ? AND usuario_id = ?', 
+            [desc, valor, tipo, status, data_vencimento || null, id, req.userId]
+        );
+        res.json({ sucesso: true });
+    } catch (erro) {
+        console.error('DB error on PUT /api/financas:', erro);
+        res.status(500).json({ erro: 'Erro ao atualizar a finança', detalhes: erro.message });
+    }
+});
+
+// Excluir Finança (Exclusão - DELETE)
+app.delete('/api/financas/:id', requireAuth, async (req, res) => {
+    try {
+        const { id } = req.params;
+        await db.query('DELETE FROM financas WHERE id = ? AND usuario_id = ?', [id, req.userId]);
+        res.json({ sucesso: true });
+    } catch (erro) {
+        console.error('DB error on DELETE /api/financas:', erro);
+        res.status(500).json({ erro: 'Erro ao excluir a finança', detalhes: erro.message });
+    }
+});
+
+// Notificações (Alertas de contas pendentes e atrasadas)
+app.get('/api/notificacoes', requireAuth, async (req, res) => {
+    try {
+        const [alertas] = await db.query(`
+            SELECT id, descricao, valor, data_vencimento, tipo 
+            FROM financas 
+            WHERE usuario_id = ? AND status = 'pendente' AND data_vencimento IS NOT NULL
+            ORDER BY data_vencimento ASC
+        `, [req.userId]);
+        
+        res.json({ alertas });
+    } catch (erro) {
+        console.error('DB error on /api/notificacoes:', erro);
+        res.status(500).json({ erro: 'Erro ao buscar notificações', detalhes: erro.message });
     }
 });
 

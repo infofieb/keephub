@@ -22,8 +22,38 @@
         }
     </script>
 
+    <style type="text/tailwindcss">
+        @layer base {
+            body.dark {
+                @apply bg-keepdark text-slate-200;
+            }
+            .dark .bg-white {
+                @apply !bg-slate-800;
+            }
+            .dark .text-keepdark {
+                @apply !text-white;
+            }
+            .dark .text-slate-500 {
+                @apply !text-slate-300;
+            }
+            .dark .border-slate-100, .dark .border-slate-200 {
+                @apply !border-slate-700;
+            }
+            .dark input, .dark select, .dark textarea {
+                @apply !bg-slate-700 !text-white !border-slate-600;
+            }
+            .dark header.bg-white\\/95 {
+                @apply !bg-keepdark/95;
+            }
+            .dark footer.bg-white\\/95 {
+                @apply !bg-keepdark/95 !border-slate-800;
+            }
+        }
+    </style>
+
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     fontFamily: {
@@ -297,19 +327,21 @@
             <header class="flex justify-between items-center mb-6">
                 <div>
                     <h2 class="text-2xl font-black text-keepdark tracking-tight">Avisos</h2>
-                    <p class="text-sm font-medium text-slate-400 mt-1">Notificações e Alertas</p>
+                    <p class="text-sm font-medium text-slate-400 mt-1">Notificações e Alertas pendentes</p>
                 </div>
             </header>
             
-            <div class="bg-white rounded-[24px] p-8 shadow-sm border border-slate-100/50 flex flex-col items-center justify-center text-center">
-                <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4">
-                    <svg class="w-8 h-8 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
-                    </svg>
+            <ul id="lista-notificacoes" class="flex flex-col gap-3 m-0 p-0 list-none">
+                <div id="notificacoes-vazio" class="bg-white dark:bg-slate-800 rounded-[24px] p-8 shadow-sm border border-slate-100 dark:border-slate-700 flex flex-col items-center justify-center text-center">
+                    <div class="w-16 h-16 bg-slate-50 dark:bg-slate-700 rounded-full flex items-center justify-center mb-4">
+                        <svg class="w-8 h-8 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-slate-500 font-semibold mb-1">Tudo em dia!</h3>
+                    <p class="text-xs text-slate-400">Não há avisos de contas a pagar.</p>
                 </div>
-                <h3 class="text-slate-500 font-semibold mb-1">Nenhum aviso de momento</h3>
-                <p class="text-xs text-slate-400">Em breve vai poder receber alertas de finanças e lembretes aqui.</p>
-            </div>
+            </ul>
         </section>
 
         <!-- ========================================== -->
@@ -331,7 +363,7 @@
 
                 <section class="relative z-10">
                     <h2 class="text-2xl font-title font-bold mb-1" id="boas-vindas-user">Olá.</h2>
-                    <p class="text-slate-400 text-sm">O seu ecossistema Bento está ativo.</p>
+                    <p class="text-slate-400 text-sm">O seu ecossistema está ativo.</p>
                 </section>
             </header>
 
@@ -463,36 +495,48 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7">
                         </path>
                     </svg></button>
-                <h2 class="text-xl font-title font-bold text-keepdark">Finanças</h2>
+                <h2 class="text-xl font-title font-bold text-keepdark flex-1">Finanças</h2>
+                <input type="month" id="filtro-mes-financas" class="bg-white border border-slate-200 text-slate-700 text-sm rounded-xl px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-keepdark shadow-sm" onchange="atualizarFinancasUI()">
             </header>
 
-            <article class="bg-keepdark p-6 rounded-3xl shadow-xl text-white relative overflow-hidden">
-                <figure class="absolute -right-10 -bottom-10 opacity-[0.05] pointer-events-none">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" class="w-48 h-48">
-                        <circle cx="50" cy="50" r="40" stroke="#FFFFFF" stroke-width="4" fill="none" />
-                        <circle cx="50" cy="50" r="20" fill="#FFFFFF" />
-                    </svg>
-                </figure>
-                <header class="mb-2 relative z-10">
-                    <h3 class="text-slate-400 font-semibold text-xs uppercase tracking-wider flex items-center gap-2">
-                        Saldo Integrado</h3>
-                    <p id="ui-saldo" class="text-4xl font-title font-bold tracking-tight mt-1 text-white">R$ 0,00</p>
-                </header>
-            </article>
+            <div class="grid grid-cols-2 gap-3">
+                <article class="col-span-2 bg-keepdark p-6 rounded-3xl shadow-xl text-white relative overflow-hidden flex justify-between items-center">
+                    <figure class="absolute -right-10 -bottom-10 opacity-[0.05] pointer-events-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" class="w-48 h-48">
+                            <circle cx="50" cy="50" r="40" stroke="#FFFFFF" stroke-width="4" fill="none" />
+                            <circle cx="50" cy="50" r="20" fill="#FFFFFF" />
+                        </svg>
+                    </figure>
+                    <div class="relative z-10">
+                        <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider mb-1">Saldo Integrado</p>
+                        <h3 id="ui-saldo" class="text-3xl font-title font-black text-white">€ 0.00</h3>
+                    </div>
+                </article>
+                <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-center">
+                    <p class="text-[10px] text-slate-400 font-semibold mb-1 uppercase tracking-wider">A Receber</p>
+                    <h4 id="total-receitas" class="text-base font-bold text-emerald-500">€ 0.00</h4>
+                </div>
+                <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-center">
+                    <p class="text-[10px] text-slate-400 font-semibold mb-1 uppercase tracking-wider">A Pagar / Gastos</p>
+                    <h4 id="total-despesas" class="text-base font-bold text-rose-500">€ 0.00</h4>
+                </div>
+            </div>
+
+            <div class="flex gap-2 mb-2 mt-2 border-b border-slate-200 dark:border-slate-800 pb-1">
+                <button onclick="mudarAbaFinancas('historico')" id="aba-historico" class="flex-1 py-2 text-sm font-bold border-b-2 border-keepdark text-keepdark dark:border-white dark:text-white transition-colors">Pagas / Recebidas</button>
+                <button onclick="mudarAbaFinancas('pendentes')" id="aba-pendentes" class="flex-1 py-2 text-sm font-bold border-b-2 border-transparent text-slate-400 transition-colors hover:text-slate-600 dark:hover:text-slate-200">Pendentes</button>
+            </div>
+
+            <ul id="lista-financas" class="p-0 m-0 list-none flex flex-col gap-3"></ul>
+            <ul id="lista-financas-pendentes" class="p-0 m-0 list-none flex flex-col gap-3 escondido"></ul>
 
             <button onclick="abrirModal('modal-financas')"
-                class="w-full bg-white border border-slate-200 text-keepdark font-bold p-4 rounded-2xl shadow-sm flex items-center justify-center gap-2 hover:bg-slate-50 transition-colors">
+                class="w-full bg-white border border-slate-200 text-keepdark font-bold p-4 rounded-2xl shadow-sm flex items-center justify-center gap-2 hover:bg-slate-50 transition-colors mt-2">
                 <svg class="w-5 h-5 text-financas" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                 </svg>
                 Nova Transação Manual
             </button>
-
-            <section>
-                <h3 class="font-title font-bold text-keepdark mb-3 px-1 text-[15px]">Histórico Recente</h3>
-                <ul id="lista-financas"
-                    class="bg-white rounded-3xl shadow-sm border border-slate-200 p-0 m-0 list-none flex flex-col"></ul>
-            </section>
         </section>
 
         <!-- METAS -->
@@ -596,6 +640,12 @@
                             d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
                         </path>
                     </svg>Terminar Sessão</button>
+                <div class="mt-6 border-t border-white/10 pt-6 w-full max-w-[200px] flex justify-between items-center relative z-10">
+                    <span class="text-sm font-semibold text-slate-300">Modo Escuro</span>
+                    <button id="btn-theme-toggle" onclick="themeToggle()" class="w-12 h-6 bg-slate-600 rounded-full relative transition-colors focus:outline-none flex items-center">
+                        <div id="btn-theme-circle" class="w-4 h-4 bg-white rounded-full absolute left-1 transition-transform transform shadow-sm"></div>
+                    </button>
+                </div>
             </article>
         </section>
     </main>
@@ -632,6 +682,19 @@
                         <option value="despesa">Despesa</option>
                         <option value="receita">Receita</option>
                     </select></section>
+            </fieldset>
+            <fieldset class="border-0 p-0 m-0 flex gap-4">
+                <section class="flex-1"><label
+                        class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1.5">Status</label><select
+                        id="fin-status"
+                        class="w-full bg-slate-50 border border-slate-200 rounded-2xl p-3.5 outline-none focus:border-keepdark focus:ring-1 focus:ring-keepdark text-sm transition-all appearance-none">
+                        <option value="pago">Pago / Recebido</option>
+                        <option value="pendente">A Pagar / A Receber</option>
+                    </select></section>
+                <section class="flex-1"><label
+                        class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1.5">Vencimento (Opcional)</label><input
+                        type="date" id="fin-vencimento"
+                        class="w-full bg-slate-50 border border-slate-200 rounded-2xl p-3.5 outline-none focus:border-keepdark focus:ring-1 focus:ring-keepdark text-sm transition-all"></section>
             </fieldset>
             <button type="submit"
                 class="w-full bg-keepdark text-white font-bold p-4 rounded-2xl mt-3 text-sm hover:bg-slate-800 transition-colors flex items-center justify-center gap-2"><svg
@@ -808,8 +871,10 @@
                         </svg><span class="text-[10px] font-bold uppercase tracking-wider">Início</span></button></li>
                 
                 <li><button
-                        class="flex flex-col items-center gap-1 hover:text-keepdark focus:outline-none p-2 rounded-xl hover:bg-slate-50 transition-colors min-w-[60px]"
-                        onclick="abrirFerramenta('tela-avisos')"><svg class="w-6 h-6" fill="none" stroke="currentColor"
+                        class="flex flex-col items-center gap-1 hover:text-keepdark focus:outline-none p-2 rounded-xl hover:bg-slate-50 transition-colors min-w-[60px] relative"
+                        onclick="abrirFerramenta('tela-avisos')">
+                        <div id="badge-avisos" class="escondido absolute top-1 right-3 w-2.5 h-2.5 bg-rose-500 border-2 border-white rounded-full"></div>
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor"
                             viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9">
@@ -849,6 +914,31 @@
         let telaAtual = 'tela-hub';
         let isModoOffline = false;
         let usuarioLogado = null;
+
+        // TEMA CLARO/ESCURO
+        function themeToggle() {
+            const isDark = document.documentElement.classList.toggle('dark');
+            localStorage.setItem('keepHubTheme', isDark ? 'dark' : 'light');
+            atualizarToggleUI(isDark);
+        }
+
+        function atualizarToggleUI(isDark) {
+            const circle = document.getElementById('btn-theme-circle');
+            const btn = document.getElementById('btn-theme-toggle');
+            if(circle && btn) {
+                if (isDark) {
+                    circle.style.transform = 'translateX(1.5rem)';
+                    btn.classList.replace('bg-slate-600', 'bg-huborange');
+                } else {
+                    circle.style.transform = 'translateX(0)';
+                    btn.classList.replace('bg-huborange', 'bg-slate-600');
+                }
+            }
+        }
+
+        if (localStorage.getItem('keepHubTheme') === 'dark' || (!('keepHubTheme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        }
 
         function obterPrimeiroNome(usuario) {
             const nome = (usuario?.nome || usuario?.name || '').trim();
@@ -1105,11 +1195,13 @@
                 const desc = document.getElementById('fin-desc').value.trim();
                 const valor = parseFloat(document.getElementById('fin-valor').value);
                 const tipo = document.getElementById('fin-tipo').value;
+                const status = document.getElementById('fin-status')?.value || 'pago';
+                const data_vencimento = document.getElementById('fin-vencimento')?.value || null;
 
                 if (!desc) return mostrarAlerta('A descrição não pode estar vazia!', 'erro');
                 if (isNaN(valor) || valor <= 0) return mostrarAlerta('O valor deve ser maior que zero!', 'erro');
 
-                payload = { desc, valor, tipo, origem: 'Manual' };
+                payload = { desc, valor, tipo, origem: 'Manual', status, data_vencimento };
             }
             else if (modulo === 'metas') {
                 const nome = document.getElementById('meta-nome').value.trim();
@@ -1195,14 +1287,99 @@
         function abrirModal(id) { document.getElementById(id).showModal(); }
         function fecharModal(id) { document.getElementById(id).close(); }
 
+        function atualizarFinancasUI() {
+            renderizarInterface();
+        }
+
+        let abaAtualFinancas = 'historico';
+        function mudarAbaFinancas(aba) {
+            abaAtualFinancas = aba;
+            const h = document.getElementById('aba-historico');
+            const p = document.getElementById('aba-pendentes');
+            if(h && p) {
+                h.className = aba === 'historico' 
+                    ? "flex-1 py-2 text-sm font-bold border-b-2 border-keepdark text-keepdark dark:border-white dark:text-white transition-colors" 
+                    : "flex-1 py-2 text-sm font-bold border-b-2 border-transparent text-slate-400 transition-colors hover:text-slate-600 dark:hover:text-slate-200";
+                p.className = aba === 'pendentes' 
+                    ? "flex-1 py-2 text-sm font-bold border-b-2 border-keepdark text-keepdark dark:border-white dark:text-white transition-colors" 
+                    : "flex-1 py-2 text-sm font-bold border-b-2 border-transparent text-slate-400 transition-colors hover:text-slate-600 dark:hover:text-slate-200";
+            }
+            
+            const lH = document.getElementById('lista-financas');
+            const lP = document.getElementById('lista-financas-pendentes');
+            if(lH) lH.classList.toggle('escondido', aba !== 'historico');
+            if(lP) lP.classList.toggle('escondido', aba !== 'pendentes');
+        }
+
+        async function excluirFinanca(id) {
+            if(!confirm('Tem a certeza que deseja excluir esta transação?')) return;
+            try {
+                if(!isModoOffline) {
+                    await fetch(`${API_URL}/financas/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${usuarioLogado.token}` }});
+                    await inicializarAplicacao();
+                } else {
+                    dadosApp.financas = dadosApp.financas.filter(f => f.id !== id);
+                    localStorage.setItem('keepHubData_' + usuarioLogado.id, JSON.stringify(dadosApp));
+                    atualizarTodasAsTelas();
+                }
+                mostrarAlerta('Transação excluída!', 'sucesso');
+            } catch(e) { mostrarAlerta('Erro ao excluir', 'erro'); }
+        }
+
         function renderizarInterface() {
-            let saldo = 0; document.getElementById('lista-financas').innerHTML = '';
-            [...dadosApp.financas].reverse().forEach(item => {
-                const isDespesa = item.tipo === 'despesa'; saldo += isDespesa ? -item.valor : parseFloat(item.valor);
-                const badge = item.origem && item.origem !== 'Manual' ? `<span class="bg-slate-100 text-slate-500 px-2 py-0.5 rounded-lg text-[9px] font-bold uppercase ml-2 border border-slate-200 shadow-sm">${item.origem}</span>` : '';
-                document.getElementById('lista-financas').innerHTML += `<li class="flex justify-between items-center p-5 border-b border-slate-100 last:border-0 hover:bg-slate-50 transition-colors"><article><h4 class="font-semibold text-keepdark text-[14px] flex items-center">${item.desc || item.descricao} ${badge}</h4><p class="text-[11px] text-slate-400 capitalize mt-0.5">${item.tipo}</p></article><strong class="${isDespesa ? 'text-keepdark' : 'text-medicamentos'} font-bold text-[14px]">${isDespesa ? '-' : '+'} R$ ${parseFloat(item.valor).toFixed(2)}</strong></li>`;
+            let saldo = 0; 
+            let totalReceitas = 0;
+            let totalDespesas = 0;
+            
+            const listaHistorico = document.getElementById('lista-financas');
+            const listaPendentes = document.getElementById('lista-financas-pendentes');
+            if (listaHistorico) listaHistorico.innerHTML = '';
+            if (listaPendentes) listaPendentes.innerHTML = '';
+            
+            const filtroInput = document.getElementById('filtro-mes-financas');
+            const filtroVal = filtroInput ? filtroInput.value : ''; // Formato "YYYY-MM"
+
+            const financasFiltradas = dadosApp.financas.filter(item => {
+                if (!filtroVal) return true;
+                const dataItem = new Date(item.data_vencimento || item.data_criacao || Date.now());
+                const mesAno = `${dataItem.getFullYear()}-${String(dataItem.getMonth() + 1).padStart(2, '0')}`;
+                return mesAno === filtroVal;
             });
-            document.getElementById('ui-saldo').innerText = `R$ ${saldo.toFixed(2)}`;
+
+            [...financasFiltradas].reverse().forEach(item => {
+                const isDespesa = item.tipo === 'despesa'; 
+                const valorF = parseFloat(item.valor);
+                const status = item.status || 'pago';
+                
+                if (status === 'pago') {
+                    saldo += isDespesa ? -valorF : valorF;
+                } else {
+                    if (isDespesa) totalDespesas += valorF;
+                    else totalReceitas += valorF;
+                }
+
+                const badge = item.origem && item.origem !== 'Manual' ? `<span class="bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-300 px-2 py-0.5 rounded-lg text-[9px] font-bold uppercase ml-2 border border-slate-200 dark:border-slate-600 shadow-sm">${item.origem}</span>` : '';
+                
+                let dataVenc = item.data_vencimento ? `<p class="text-[10px] text-financas mt-1 font-bold">Vence a: ${new Date(item.data_vencimento).toLocaleDateString('pt-BR')}</p>` : '';
+                
+                const btnExcluir = `<button onclick="excluirFinanca(${item.id})" class="text-slate-300 hover:text-financas ml-3 focus:outline-none"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>`;
+
+                const htmlItem = `<li class="flex justify-between items-center p-5 bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl shadow-sm transition-colors"><article><h4 class="font-bold text-keepdark text-[14px] flex items-center">${item.desc || item.descricao} ${badge}</h4><p class="text-[11px] text-slate-400 capitalize mt-0.5">${item.tipo}</p>${status === 'pendente' ? dataVenc : ''}</article><div class="flex items-center"><strong class="${isDespesa ? 'text-rose-500' : 'text-emerald-500'} font-bold text-[14px]">${isDespesa ? '-' : '+'} € ${valorF.toFixed(2)}</strong>${btnExcluir}</div></li>`;
+                
+                if (status === 'pendente') {
+                    if (listaPendentes) listaPendentes.innerHTML += htmlItem;
+                } else {
+                    if (listaHistorico) listaHistorico.innerHTML += htmlItem;
+                }
+            });
+            
+            const elSaldo = document.getElementById('ui-saldo');
+            const elReceitas = document.getElementById('total-receitas');
+            const elDespesas = document.getElementById('total-despesas');
+            
+            if (elSaldo) elSaldo.innerText = `€ ${saldo.toFixed(2)}`;
+            if (elReceitas) elReceitas.innerText = `€ ${totalReceitas.toFixed(2)}`;
+            if (elDespesas) elDespesas.innerText = `€ ${totalDespesas.toFixed(2)}`;
 
             document.getElementById('lista-metas').innerHTML = '';
             dadosApp.metas.forEach(item => {
@@ -1228,7 +1405,39 @@
                 document.getElementById('lista-pets').innerHTML += `<li class="flex items-center gap-4 border-b border-slate-100 pb-4 last:border-0 pt-2"><figure class="bg-pets/10 text-pets p-3 rounded-2xl m-0"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10a2 2 0 11-4 0 2 2 0 014 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9c0-4.97 4.03-9 9-9s9 4.03 9 9z"></path></svg></figure><article><p class="text-[15px] font-bold text-keepdark">${item.acao}</p><p class="text-[11px] text-slate-400 mt-1 uppercase tracking-wide flex items-center">Previsto: ${dataF} ${custoInfo}</p></article></li>`;
             });
         }
-        function atualizarTodasAsTelas() { renderizarInterface(); }
+        async function carregarNotificacoes() {
+            try {
+                if(!isModoOffline && usuarioLogado) {
+                    const res = await fetch(`${API_URL}/notificacoes`, { headers: { 'Authorization': `Bearer ${usuarioLogado.token}` }});
+                    const { alertas } = await res.json();
+                    
+                    const badge = document.getElementById('badge-avisos');
+                    const lista = document.getElementById('lista-notificacoes');
+                    const vazio = document.getElementById('notificacoes-vazio');
+                    
+                    if (alertas && alertas.length > 0) {
+                        if(badge) badge.classList.remove('escondido');
+                        if(vazio) vazio.classList.add('escondido');
+                        
+                        lista.innerHTML = '';
+                        lista.appendChild(vazio);
+                        
+                        alertas.forEach(al => {
+                            const data = new Date(al.data_vencimento).toLocaleDateString('pt-BR');
+                            lista.innerHTML += `<li class="p-4 bg-white dark:bg-slate-800 rounded-2xl border-l-4 border-rose-500 shadow-sm"><div class="flex justify-between items-start"><div><h4 class="font-bold text-sm text-keepdark flex items-center gap-2"><svg class="w-4 h-4 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>${al.descricao}</h4><p class="text-xs text-slate-500 mt-1">Vence a: ${data}</p></div><strong class="text-sm font-bold text-rose-500">€ ${parseFloat(al.valor).toFixed(2)}</strong></div><button onclick="abrirFerramenta('tela-financas'); mudarAbaFinancas('pendentes');" class="mt-3 w-full bg-slate-50 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs py-2 rounded-xl font-bold hover:bg-slate-100 transition-colors">Ver Finanças</button></li>`;
+                        });
+                    } else {
+                        if(badge) badge.classList.add('escondido');
+                        if(vazio) vazio.classList.remove('escondido');
+                    }
+                }
+            } catch(e) {}
+        }
+
+        function atualizarTodasAsTelas() { 
+            renderizarInterface(); 
+            carregarNotificacoes();
+        }
     </script>
 </body>
 
