@@ -178,6 +178,119 @@
     <main class="flex-grow p-4 overflow-y-auto relative z-10" id="area-principal">
 
         <!-- ========================================== -->
+        <!-- TELA DE AUTENTICAÇÃO (LOGIN / CADASTRO)    -->
+        <!-- ========================================== -->
+        <section id="tela-auth" class="escondido space-y-6 py-4 flex flex-col justify-center min-h-[75vh]">
+            
+            <header class="text-center space-y-2">
+                <figure class="m-0 flex items-center justify-center relative scale-110 mb-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" class="w-16 h-16">
+                        <g stroke="#334155" stroke-width="3" stroke-linecap="round">
+                            <line x1="50" y1="50" x2="50" y2="15" />
+                            <line x1="50" y1="50" x2="83" y2="39" />
+                            <line x1="50" y1="50" x2="70" y2="78" />
+                            <line x1="50" y1="50" x2="30" y2="78" />
+                            <line x1="50" y1="50" x2="17" y2="39" />
+                        </g>
+                        <circle cx="50" cy="15" r="7.5" fill="#E06D81" />
+                        <circle cx="83" cy="39" r="7.5" fill="#EBB465" />
+                        <circle cx="70" cy="78" r="7.5" fill="#96A071" />
+                        <circle cx="30" cy="78" r="7.5" fill="#58B8A1" />
+                        <circle cx="17" cy="39" r="7.5" fill="#B896C3" />
+                        <circle cx="50" cy="50" r="11" fill="#F97316" class="neon-hub" />
+                        <circle cx="50" cy="50" r="5" fill="#111827" />
+                    </svg>
+                </figure>
+                <h2 class="text-2xl font-title font-black text-keepdark tracking-tight">KEEP HUB</h2>
+                <p class="text-xs text-slate-500 max-w-[280px] mx-auto">Controlo e autonomia integrados para a sua rotina diária.</p>
+            </header>
+
+            <article class="bg-white p-6 rounded-3xl shadow-md border border-slate-200">
+                <nav class="flex border-b border-slate-100 mb-6" aria-label="Abas de Autenticação">
+                    <button onclick="mudarAbaAuth('login')" id="aba-login"
+                        class="flex-1 pb-3 text-sm font-bold text-keepdark border-b-2 border-huborange focus:outline-none transition-all">
+                        Entrar
+                    </button>
+                    <button onclick="mudarAbaAuth('cadastro')" id="aba-cadastro"
+                        class="flex-1 pb-3 text-sm font-semibold text-slate-400 border-b-2 border-transparent focus:outline-none transition-all">
+                        Criar Conta
+                    </button>
+                </nav>
+
+                <form id="form-login" onsubmit="executarAuth(event, 'login')" class="space-y-4">
+                    <fieldset class="border-0 p-0 m-0">
+                        <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Email</label>
+                        <input type="email" id="login-email" required
+                            class="w-full bg-slate-50 border border-slate-200 rounded-2xl p-3.5 outline-none focus:border-keepdark focus:ring-1 focus:ring-keepdark text-sm transition-all"
+                            placeholder="exemplo@email.com">
+                    </fieldset>
+                    <fieldset class="border-0 p-0 m-0 relative">
+                        <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Senha</label>
+                        <input type="password" id="login-senha" required
+                            class="w-full bg-slate-50 border border-slate-200 rounded-2xl p-3.5 outline-none focus:border-keepdark focus:ring-1 focus:ring-keepdark text-sm transition-all pr-12"
+                            placeholder="Inserir senha">
+                        <button type="button" onclick="alternarVisibilidadeSenha('login-senha')"
+                            class="absolute right-3.5 bottom-3.5 text-slate-400 hover:text-slate-600 focus:outline-none">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" id="eye-login-senha">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                        </button>
+                    </fieldset>
+                    <button type="submit"
+                        class="w-full bg-keepdark text-white font-bold p-4 rounded-2xl mt-4 text-sm hover:bg-slate-800 transition-colors flex items-center justify-center gap-2">
+                        Iniciar Sessão
+                    </button>
+                </form>
+
+                <form id="form-cadastro" onsubmit="executarAuth(event, 'cadastro')" class="escondido space-y-4">
+                    <fieldset class="border-0 p-0 m-0">
+                        <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Nome Completo</label>
+                        <input type="text" id="cad-nome"
+                            class="w-full bg-slate-50 border border-slate-200 rounded-2xl p-3.5 outline-none focus:border-keepdark focus:ring-1 focus:ring-keepdark text-sm transition-all"
+                            placeholder="Fulano de Tal">
+                    </fieldset>
+                    <fieldset class="border-0 p-0 m-0">
+                        <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Email</label>
+                        <input type="email" id="cad-email"
+                            class="w-full bg-slate-50 border border-slate-200 rounded-2xl p-3.5 outline-none focus:border-keepdark focus:ring-1 focus:ring-keepdark text-sm transition-all"
+                            placeholder="exemplo@email.com">
+                    </fieldset>
+                    <fieldset class="border-0 p-0 m-0 relative">
+                        <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Senha</label>
+                        <input type="password" id="cad-senha"
+                            class="w-full bg-slate-50 border border-slate-200 rounded-2xl p-3.5 outline-none focus:border-keepdark focus:ring-1 focus:ring-keepdark text-sm transition-all pr-12"
+                            placeholder="Mínimo 6 caracteres">
+                        <button type="button" onclick="alternarVisibilidadeSenha('cad-senha')"
+                            class="absolute right-3.5 bottom-3.5 text-slate-400 hover:text-slate-600 focus:outline-none">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" id="eye-cad-senha">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                        </button>
+                    </fieldset>
+                    <fieldset class="border-0 p-0 m-0 relative">
+                        <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Confirmar Senha</label>
+                        <input type="password" id="cad-confirma"
+                            class="w-full bg-slate-50 border border-slate-200 rounded-2xl p-3.5 outline-none focus:border-keepdark focus:ring-1 focus:ring-keepdark text-sm transition-all pr-12"
+                            placeholder="Repetir senha">
+                        <button type="button" onclick="alternarVisibilidadeSenha('cad-confirma')"
+                            class="absolute right-3.5 bottom-3.5 text-slate-400 hover:text-slate-600 focus:outline-none">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" id="eye-cad-confirma">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                        </button>
+                    </fieldset>
+                    <button type="submit"
+                        class="w-full bg-keepdark text-white font-bold p-4 rounded-2xl mt-4 text-sm hover:bg-slate-800 transition-colors flex items-center justify-center gap-2">
+                        Registar e Entrar
+                    </button>
+                </form>
+            </article>
+        </section>
+
+        <!-- ========================================== -->
         <!-- HUB PRINCIPAL (BENTO UI GRID)              -->
         <!-- ========================================== -->
         <section id="tela-hub" class="block space-y-4 pb-6" data-modulo="hub">
@@ -463,7 +576,7 @@
                     <h3 class="font-title font-bold text-white text-xl">Fulano de Tal</h3>
                     <p class="text-slate-400 text-sm">fulano@keephub.pt</p>
                 </header>
-                <button
+                <button onclick="terminarSessao()"
                     class="mt-2 bg-white/10 px-4 py-2 rounded-xl text-white text-sm font-semibold flex items-center gap-2 hover:bg-financas hover:text-white transition-colors relative z-10"><svg
                         class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -718,18 +831,161 @@
         let dadosApp = { financas: [], metas: [], despensa: [], medicamentos: [], pets: [] };
         let telaAtual = 'tela-hub';
         let isModoOffline = false;
+        let usuarioLogado = null;
+
+        // --- SISTEMA DE NAVEGAÇÃO E AUTHENTICAÇÃO VISUAL ---
+        function mudarAbaAuth(aba) {
+            if (aba === 'login') {
+                document.getElementById('aba-login').className = "flex-1 pb-3 text-sm font-bold text-keepdark border-b-2 border-huborange focus:outline-none transition-all";
+                document.getElementById('aba-cadastro').className = "flex-1 pb-3 text-sm font-semibold text-slate-400 border-b-2 border-transparent focus:outline-none transition-all";
+                document.getElementById('form-login').classList.remove('escondido');
+                document.getElementById('form-cadastro').classList.add('escondido');
+            } else {
+                document.getElementById('aba-cadastro').className = "flex-1 pb-3 text-sm font-bold text-keepdark border-b-2 border-huborange focus:outline-none transition-all";
+                document.getElementById('aba-login').className = "flex-1 pb-3 text-sm font-semibold text-slate-400 border-b-2 border-transparent focus:outline-none transition-all";
+                document.getElementById('form-cadastro').classList.remove('escondido');
+                document.getElementById('form-login').classList.add('escondido');
+            }
+        }
+
+        function alternarVisibilidadeSenha(idInput) {
+            const input = document.getElementById(idInput);
+            const eye = document.getElementById('eye-' + idInput);
+            if (input.type === 'password') {
+                input.type = 'text';
+                eye.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" />`;
+            } else {
+                input.type = 'password';
+                eye.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />`;
+            }
+        }
+
+        async function executarAuth(event, tipo) {
+            event.preventDefault();
+            
+            if (tipo === 'login') {
+                const email = document.getElementById('login-email').value.trim();
+                const senha = document.getElementById('login-senha').value;
+                
+                if (!email || !senha) return mostrarAlerta('Preencha todos os campos!', 'erro');
+                
+                try {
+                    const resposta = await fetch(`${API_URL}/auth/login`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email, senha })
+                    });
+                    
+                    const dados = await resposta.json();
+                    if (!resposta.ok) throw new Error(dados.erro || 'Falha no login');
+                    
+                    localStorage.setItem('keepHubUser', JSON.stringify({
+                        id: dados.usuario.id,
+                        nome: dados.usuario.nome,
+                        email: dados.usuario.email,
+                        token: dados.token
+                    }));
+                    
+                    mostrarAlerta(`Bem-vindo, ${dados.usuario.nome}!`, 'sucesso');
+                    inicializarAplicacao();
+                } catch (erro) {
+                    mostrarAlerta(erro.message, 'erro');
+                }
+            } else {
+                const nome = document.getElementById('cad-nome').value.trim();
+                const email = document.getElementById('cad-email').value.trim();
+                const senha = document.getElementById('cad-senha').value;
+                const confirma = document.getElementById('cad-confirma').value;
+                
+                if (!nome || !email || !senha || !confirma) return mostrarAlerta('Preencha todos os campos!', 'erro');
+                
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(email)) return mostrarAlerta('Formato de email inválido!', 'erro');
+                
+                if (senha.length < 6) return mostrarAlerta('A senha deve ter pelo menos 6 caracteres!', 'erro');
+                
+                if (senha !== confirma) return mostrarAlerta('As senhas não coincidem!', 'erro');
+                
+                try {
+                    const resposta = await fetch(`${API_URL}/auth/register`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ nome, email, senha })
+                    });
+                    
+                    const dados = await resposta.json();
+                    if (!resposta.ok) throw new Error(dados.erro || 'Erro ao criar conta');
+                    
+                    localStorage.setItem('keepHubUser', JSON.stringify({
+                        id: dados.usuario.id,
+                        nome: dados.usuario.nome,
+                        email: dados.usuario.email,
+                        token: dados.token
+                    }));
+                    
+                    mostrarAlerta('Conta criada com sucesso!', 'sucesso');
+                    inicializarAplicacao();
+                } catch (erro) {
+                    mostrarAlerta(erro.message, 'erro');
+                }
+            }
+        }
+
+        function terminarSessao() {
+            localStorage.removeItem('keepHubUser');
+            usuarioLogado = null;
+            mostrarAlerta('Sessão terminada!', 'sucesso');
+            inicializarAplicacao();
+        }
 
         async function inicializarAplicacao() {
+            const userStr = localStorage.getItem('keepHubUser');
+            
+            if (!userStr) {
+                document.querySelector('header').classList.add('escondido');
+                document.querySelector('footer').classList.add('escondido');
+                document.querySelectorAll('main > section').forEach(s => s.classList.add('escondido'));
+                document.getElementById('tela-auth').classList.remove('escondido');
+                return;
+            }
+            
+            usuarioLogado = JSON.parse(userStr);
+            document.querySelector('header').classList.remove('escondido');
+            document.querySelector('footer').classList.remove('escondido');
+            document.getElementById('tela-auth').classList.add('escondido');
+            
+            const avatarUrl = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(usuarioLogado.nome)}&backgroundColor=111827`;
+            document.querySelectorAll('img[alt="Avatar"]').forEach(img => img.src = avatarUrl);
+            document.querySelector('#tela-perfil h3').innerText = usuarioLogado.nome;
+            document.querySelector('#tela-perfil p').innerText = usuarioLogado.email;
+            
+            abrirFerramenta('tela-hub');
+            
             try {
-                const resposta = await fetch(`${API_URL}/sync`);
+                const resposta = await fetch(`${API_URL}/sync`, {
+                    headers: { 'Authorization': `Bearer ${usuarioLogado.token}` }
+                });
+                
+                if (resposta.status === 401) {
+                    terminarSessao();
+                    return;
+                }
+                
                 if (resposta.ok) {
                     dadosApp = await resposta.json();
                     document.getElementById('status-conexao').innerHTML = '<span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-huborange opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-huborange"></span></span> Sincronizado via MySQL';
+                    localStorage.setItem('keepHubData_' + usuarioLogado.id, JSON.stringify(dadosApp));
+                } else {
+                    throw new Error('Falha na sincronização');
                 }
             } catch (erro) {
                 isModoOffline = true;
-                const dadosGuardados = localStorage.getItem('keepHubData');
-                if (dadosGuardados) dadosApp = JSON.parse(dadosGuardados);
+                const dadosGuardados = localStorage.getItem('keepHubData_' + usuarioLogado.id);
+                if (dadosGuardados) {
+                    dadosApp = JSON.parse(dadosGuardados);
+                } else {
+                    dadosApp = { financas: [], metas: [], despensa: [], medicamentos: [], pets: [] };
+                }
                 document.getElementById('status-conexao').innerHTML = '<span class="relative flex h-2 w-2"><span class="relative inline-flex rounded-full h-2 w-2 bg-slate-400"></span></span> Modo Offline (Local)';
             }
             atualizarTodasAsTelas();
@@ -827,7 +1083,14 @@
             // 2. GRAVAÇÃO DE DADOS (COM TRY CATCH E ALERTAS)
             try {
                 if (!isModoOffline) {
-                    const resposta = await fetch(`${API_URL}/${modulo}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                    const resposta = await fetch(`${API_URL}/${modulo}`, {
+                        method: 'POST',
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${usuarioLogado.token}`
+                        },
+                        body: JSON.stringify(payload)
+                    });
                     if (!resposta.ok) throw new Error('Erro na API');
                     await inicializarAplicacao();
                 } else {
@@ -837,7 +1100,7 @@
                     if (modulo === 'medicamentos') dadosApp.medicamentos.push({ ...payload });
                     if (modulo === 'pets') { dadosApp.pets.push({ ...payload, custo: parseFloat(payload.custo) }); if (payload.custo > 0) dadosApp.financas.push({ desc: `Vet: ${payload.acao}`, valor: parseFloat(payload.custo), tipo: 'despesa', origem: 'Pets' }); }
 
-                    localStorage.setItem('keepHubData', JSON.stringify(dadosApp));
+                    localStorage.setItem('keepHubData_' + usuarioLogado.id, JSON.stringify(dadosApp));
                     atualizarTodasAsTelas();
                 }
 
