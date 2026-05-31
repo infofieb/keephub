@@ -994,7 +994,7 @@
             }
         }
 
-        if (localStorage.getItem('keepHubTheme') === 'dark' || (!('keepHubTheme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        if (localStorage.getItem('keepHubTheme') === 'dark') {
             document.documentElement.classList.add('dark');
         }
 
