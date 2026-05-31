@@ -159,6 +159,21 @@
     <output id="container-alertas"
         class="fixed top-4 left-0 right-0 z-[100] flex flex-col items-center gap-2 pointer-events-none px-4"></output>
 
+    <!-- BANNER INSTALAÇÃO PWA -->
+    <div id="pwa-install-banner" class="fixed bottom-24 left-4 right-4 bg-keepdark text-white p-4 rounded-3xl shadow-2xl flex items-center justify-between z-[90] transform translate-y-[250%] transition-transform duration-500 max-w-md mx-auto border border-slate-700">
+        <div class="flex items-center gap-3">
+            <img src="icon-192.png" alt="Keephub" class="w-10 h-10 rounded-xl shadow-sm border border-slate-600">
+            <div>
+                <h4 class="font-bold text-sm leading-tight">Instalar Keephub</h4>
+                <p class="text-[10px] text-slate-400 mt-0.5">Acesso rápido no seu telemóvel</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-2">
+            <button onclick="fecharBannerPWA()" class="p-2 text-slate-400 hover:text-white transition-colors focus:outline-none"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+            <button onclick="instalarPWA()" class="px-4 py-2 bg-huborange text-white text-xs font-bold rounded-xl hover:bg-orange-600 transition-colors shadow-lg">Instalar</button>
+        </div>
+    </div>
+
     <!-- CABEÇALHO (Header) - Tema Escuro Premium -->
     <header id="app-header"
         class="bg-keepdark text-white px-5 py-4 shadow-md sticky top-0 z-30 flex justify-between items-center border-b border-slate-800">
@@ -927,7 +942,22 @@
             pwaDeferredPrompt = e;
             const btnContainer = document.getElementById('container-install-pwa');
             if (btnContainer) btnContainer.classList.remove('escondido');
+            
+            if (!localStorage.getItem('pwa_banner_dispensado')) {
+                const banner = document.getElementById('pwa-install-banner');
+                if(banner) {
+                    setTimeout(() => {
+                        banner.classList.remove('translate-y-[250%]');
+                    }, 2000);
+                }
+            }
         });
+
+        function fecharBannerPWA() {
+            localStorage.setItem('pwa_banner_dispensado', 'true');
+            const banner = document.getElementById('pwa-install-banner');
+            if(banner) banner.classList.add('translate-y-[250%]');
+        }
 
         async function instalarPWA() {
             if (pwaDeferredPrompt) {
@@ -936,6 +966,7 @@
                 if (outcome === 'accepted') {
                     const btnContainer = document.getElementById('container-install-pwa');
                     if (btnContainer) btnContainer.classList.add('escondido');
+                    fecharBannerPWA();
                 }
                 pwaDeferredPrompt = null;
             }
