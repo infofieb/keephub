@@ -233,6 +233,23 @@ app.post('/api/auth/register', async (req, res) => {
     }
 });
 
+// Perfil do utilizador autenticado
+app.get('/api/auth/me', requireAuth, async (req, res) => {
+    try {
+        const [usuarios] = await db.query(
+            'SELECT id, nome, email FROM usuarios WHERE id = ?',
+            [req.userId]
+        );
+        if (usuarios.length === 0) {
+            return res.status(404).json({ erro: 'Utilizador não encontrado.' });
+        }
+        res.json({ usuario: usuarios[0] });
+    } catch (erro) {
+        console.error('Erro em /api/auth/me:', erro);
+        res.status(500).json({ erro: 'Erro ao obter perfil.' });
+    }
+});
+
 // Iniciar Sessão (Login)
 app.post('/api/auth/login', async (req, res) => {
     try {

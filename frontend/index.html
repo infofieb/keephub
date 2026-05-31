@@ -129,7 +129,7 @@
         class="fixed top-4 left-0 right-0 z-[100] flex flex-col items-center gap-2 pointer-events-none px-4"></output>
 
     <!-- CABEÇALHO (Header) - Tema Escuro Premium -->
-    <header
+    <header id="app-header"
         class="bg-keepdark text-white px-5 py-4 shadow-md sticky top-0 z-30 flex justify-between items-center border-b border-slate-800">
         <section class="flex items-center gap-3">
 
@@ -168,7 +168,7 @@
             <button onclick="abrirFerramenta('tela-perfil')"
                 class="w-10 h-10 rounded-full overflow-hidden border-2 border-slate-700 focus:outline-none focus:ring-2 focus:ring-huborange transition-all shadow-sm">
                 <span class="sr-only">Perfil</span>
-                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Fulano&backgroundColor=111827" alt="Avatar"
+                <img data-user-avatar src="https://api.dicebear.com/7.x/avataaars/svg?seed=keephub&backgroundColor=111827" alt="Avatar"
                     class="w-full h-full object-cover">
             </button>
         </nav>
@@ -308,7 +308,7 @@
                 </figure>
 
                 <section class="relative z-10">
-                    <h2 class="text-2xl font-title font-bold mb-1" id="boas-vindas-user">Olá, Fulano.</h2>
+                    <h2 class="text-2xl font-title font-bold mb-1" id="boas-vindas-user">Olá.</h2>
                     <p class="text-slate-400 text-sm">O seu ecossistema Bento está ativo.</p>
                 </section>
             </header>
@@ -561,11 +561,11 @@
                 class="bg-keepdark p-8 rounded-3xl shadow-xl flex flex-col items-center text-center gap-4 relative overflow-hidden text-white">
                 <figure
                     class="w-24 h-24 rounded-full overflow-hidden border-4 border-slate-700 shadow-lg m-0 relative z-10">
-                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Fulano&backgroundColor=111827"
+                    <img data-user-avatar src="https://api.dicebear.com/7.x/avataaars/svg?seed=keephub&backgroundColor=111827"
                         alt="Avatar" class="w-full h-full object-cover"></figure>
                 <header class="relative z-10">
-                    <h3 class="font-title font-bold text-white text-xl">Fulano de Tal</h3>
-                    <p class="text-slate-400 text-sm">fulano@keephub.pt</p>
+                    <h3 id="perfil-nome" class="font-title font-bold text-white text-xl">—</h3>
+                    <p id="perfil-email" class="text-slate-400 text-sm">—</p>
                 </header>
                 <button onclick="terminarSessao()"
                     class="mt-2 bg-white/10 px-4 py-2 rounded-xl text-white text-sm font-semibold flex items-center gap-2 hover:bg-financas hover:text-white transition-colors relative z-10"><svg
@@ -772,7 +772,7 @@
     <!-- ========================================== -->
     <!-- NAVEGAÇÃO INFERIOR                         -->
     <!-- ========================================== -->
-    <footer
+    <footer id="app-footer"
         class="bg-white/95 backdrop-blur-md border-t border-slate-200 mt-auto sticky bottom-0 z-30 pb-safe shadow-[0_-4px_20px_rgba(0,0,0,0.02)]">
         <nav aria-label="Navegação Global">
             <ul class="flex justify-around items-center list-none m-0 px-2 py-2 text-slate-400">
@@ -824,6 +824,75 @@
         let isModoOffline = false;
         let usuarioLogado = null;
 
+        function obterPrimeiroNome(usuario) {
+            const nome = (usuario?.nome || usuario?.name || '').trim();
+            if (nome) return nome.split(/\s+/)[0];
+            const email = (usuario?.email || '').trim();
+            if (email) return email.split('@')[0];
+            return 'Utilizador';
+        }
+
+        function atualizarUIUtilizador() {
+            if (!usuarioLogado) return;
+
+            const primeiroNome = obterPrimeiroNome(usuarioLogado);
+            const nomeCompleto = (usuarioLogado.nome || usuarioLogado.name || '').trim() || primeiroNome;
+            const email = usuarioLogado.email || '';
+
+            const boasVindas = document.getElementById('boas-vindas-user');
+            if (boasVindas) boasVindas.textContent = `Olá, ${primeiroNome}.`;
+
+            const perfilNome = document.getElementById('perfil-nome');
+            const perfilEmail = document.getElementById('perfil-email');
+            if (perfilNome) perfilNome.textContent = nomeCompleto;
+            if (perfilEmail) perfilEmail.textContent = email || '—';
+
+            const seed = encodeURIComponent(nomeCompleto || email || 'keephub');
+            const avatarUrl = `https://api.dicebear.com/7.x/avataaars/svg?seed=${seed}&backgroundColor=111827`;
+            document.querySelectorAll('[data-user-avatar]').forEach((img) => { img.src = avatarUrl; });
+        }
+
+        function guardarSessaoUtilizador(dados) {
+            usuarioLogado = {
+                id: dados.usuario.id,
+                nome: dados.usuario.nome,
+                email: dados.usuario.email,
+                token: dados.token
+            };
+            localStorage.setItem('keepHubUser', JSON.stringify(usuarioLogado));
+            atualizarUIUtilizador();
+        }
+
+        async function carregarPerfilUtilizador() {
+            if (!usuarioLogado?.token) return;
+
+            try {
+                const resposta = await fetch(`${API_URL}/auth/me`, {
+                    headers: { 'Authorization': `Bearer ${usuarioLogado.token}` }
+                });
+
+                if (resposta.status === 401) {
+                    terminarSessao();
+                    return;
+                }
+
+                if (resposta.ok) {
+                    const dados = await resposta.json();
+                    usuarioLogado = {
+                        ...usuarioLogado,
+                        id: dados.usuario.id,
+                        nome: dados.usuario.nome,
+                        email: dados.usuario.email
+                    };
+                    localStorage.setItem('keepHubUser', JSON.stringify(usuarioLogado));
+                }
+            } catch (_) {
+                /* mantém dados do localStorage em modo offline */
+            }
+
+            atualizarUIUtilizador();
+        }
+
         // --- SISTEMA DE NAVEGAÇÃO E AUTHENTICAÇÃO VISUAL ---
         function mudarAbaAuth(aba) {
             if (aba === 'login') {
@@ -870,13 +939,7 @@
                     const dados = await resposta.json();
                     if (!resposta.ok) throw new Error(dados.erro || 'Falha no login');
                     
-                    localStorage.setItem('keepHubUser', JSON.stringify({
-                        id: dados.usuario.id,
-                        nome: dados.usuario.nome,
-                        email: dados.usuario.email,
-                        token: dados.token
-                    }));
-                    
+                    guardarSessaoUtilizador(dados);
                     mostrarAlerta(`Bem-vindo, ${dados.usuario.nome}!`, 'sucesso');
                     inicializarAplicacao();
                 } catch (erro) {
@@ -907,13 +970,7 @@
                     const dados = await resposta.json();
                     if (!resposta.ok) throw new Error(dados.erro || 'Erro ao criar conta');
                     
-                    localStorage.setItem('keepHubUser', JSON.stringify({
-                        id: dados.usuario.id,
-                        nome: dados.usuario.nome,
-                        email: dados.usuario.email,
-                        token: dados.token
-                    }));
-                    
+                    guardarSessaoUtilizador(dados);
                     mostrarAlerta('Conta criada com sucesso!', 'sucesso');
                     inicializarAplicacao();
                 } catch (erro) {
@@ -933,27 +990,24 @@
             const userStr = localStorage.getItem('keepHubUser');
             
             if (!userStr) {
-                document.querySelector('header').classList.add('escondido');
-                document.querySelector('footer').classList.add('escondido');
+                document.getElementById('app-header')?.classList.add('escondido');
+                document.getElementById('app-footer')?.classList.add('escondido');
                 document.querySelectorAll('main > section').forEach(s => s.classList.add('escondido'));
                 document.getElementById('tela-auth').classList.remove('escondido');
                 return;
             }
             
             usuarioLogado = JSON.parse(userStr);
-            document.querySelector('header').classList.remove('escondido');
-            document.querySelector('footer').classList.remove('escondido');
+            document.getElementById('app-header')?.classList.remove('escondido');
+            document.getElementById('app-footer')?.classList.remove('escondido');
             document.getElementById('tela-auth').classList.add('escondido');
-            
-            const avatarUrl = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(usuarioLogado.nome)}&backgroundColor=111827`;
-            document.querySelectorAll('img[alt="Avatar"]').forEach(img => img.src = avatarUrl);
-            document.querySelector('#tela-perfil h3').innerText = usuarioLogado.nome;
-            document.querySelector('#tela-perfil p').innerText = usuarioLogado.email;
 
-            const primeiroNome = usuarioLogado.nome.split(' ')[0];
-            document.getElementById('boas-vindas-user').innerText = `Olá, ${primeiroNome}.`;
-            
+            atualizarUIUtilizador();
+            await carregarPerfilUtilizador();
+            if (!usuarioLogado) return;
+
             abrirFerramenta('tela-hub');
+            isModoOffline = false;
             
             try {
                 const resposta = await fetch(`${API_URL}/sync`, {
@@ -968,6 +1022,7 @@
                 if (resposta.ok) {
                     dadosApp = await resposta.json();
                     localStorage.setItem('keepHubData_' + usuarioLogado.id, JSON.stringify(dadosApp));
+                    isModoOffline = false;
                 } else {
                     throw new Error('Falha na sincronização');
                 }
