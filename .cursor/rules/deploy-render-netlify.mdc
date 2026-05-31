@@ -1,0 +1,17 @@
+---
+description: Deploy automático ao concluir tarefas no KeepHub
+alwaysApply: true
+---
+
+# Deploy Render + Netlify ao finalizar tarefas
+
+Quando concluir uma tarefa que alterou código do KeepHub:
+
+1. Confirme que as alterações estão prontas (sem secrets em ficheiros commitados).
+2. Faça commit e push para `main` em `https://github.com/infofieb/keephub.git` (dispara auto-deploy no Render e Netlify).
+3. Verifique o deploy:
+   - **Render**: serviço `keephub-backend` (root `backend/`)
+   - **Netlify**: publish `frontend/` (proxy `/api/*` → Render)
+4. Informe o utilizador quando o push foi feito e que os deploys foram disparados.
+
+Não deixar tarefas “concluídas” apenas no disco local se o objetivo era entregar em produção.
