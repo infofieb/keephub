@@ -308,17 +308,8 @@
                 </figure>
 
                 <section class="relative z-10">
-                    <h2 class="text-2xl font-title font-bold mb-1">Olá, Fulano.</h2>
+                    <h2 class="text-2xl font-title font-bold mb-1" id="boas-vindas-user">Olá, Fulano.</h2>
                     <p class="text-slate-400 text-sm">O seu ecossistema Bento está ativo.</p>
-                    <span id="status-conexao"
-                        class="inline-flex items-center gap-2 mt-4 bg-slate-800 border border-slate-700 px-3 py-1.5 rounded-xl text-xs font-medium text-slate-300 backdrop-blur-sm">
-                        <span class="relative flex h-2 w-2">
-                            <span
-                                class="animate-ping absolute inline-flex h-full w-full rounded-full bg-huborange opacity-75"></span>
-                            <span class="relative inline-flex rounded-full h-2 w-2 bg-huborange"></span>
-                        </span>
-                        Sincronização Online
-                    </span>
                 </section>
             </header>
 
@@ -958,6 +949,9 @@
             document.querySelectorAll('img[alt="Avatar"]').forEach(img => img.src = avatarUrl);
             document.querySelector('#tela-perfil h3').innerText = usuarioLogado.nome;
             document.querySelector('#tela-perfil p').innerText = usuarioLogado.email;
+
+            const primeiroNome = usuarioLogado.nome.split(' ')[0];
+            document.getElementById('boas-vindas-user').innerText = `Olá, ${primeiroNome}.`;
             
             abrirFerramenta('tela-hub');
             
@@ -973,7 +967,6 @@
                 
                 if (resposta.ok) {
                     dadosApp = await resposta.json();
-                    document.getElementById('status-conexao').innerHTML = '<span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-huborange opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-huborange"></span></span> Sincronizado via MySQL';
                     localStorage.setItem('keepHubData_' + usuarioLogado.id, JSON.stringify(dadosApp));
                 } else {
                     throw new Error('Falha na sincronização');
@@ -986,7 +979,6 @@
                 } else {
                     dadosApp = { financas: [], metas: [], despensa: [], medicamentos: [], pets: [] };
                 }
-                document.getElementById('status-conexao').innerHTML = '<span class="relative flex h-2 w-2"><span class="relative inline-flex rounded-full h-2 w-2 bg-slate-400"></span></span> Modo Offline (Local)';
             }
             atualizarTodasAsTelas();
         }
