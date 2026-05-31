@@ -1,9 +1,28 @@
+# Configuração do site Netlify (https://keephub.netlify.app)
+# Deploy automático: push em main → GitHub Action .github/workflows/netlify-deploy.yml
+
 [build]
   publish = "frontend"
   command = ""
+
+[build.environment]
+  NODE_VERSION = "22"
+
+[context.production]
+  branch = "main"
 
 [[redirects]]
   from = "/api/*"
   to = "https://keephub-8e71.onrender.com/api/:splat"
   status = 200
   force = true
+
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "no-cache"
+
+[[headers]]
+  for = "/index.html"
+  [headers.values]
+    Cache-Control = "no-cache"

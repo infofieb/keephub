@@ -15,16 +15,50 @@ Render (backend)
 
 Notes: do NOT store secrets in the repo. Leave values empty in `render.yaml` and set them in Render's dashboard.
 
-Netlify (frontend)
-- `netlify.toml` is configured to publish the `frontend` folder.
-- `_redirects` in `frontend/_redirects` proxies `/api/*` to the Render backend.
-- Ensure the Netlify site is set to deploy from branch `main` (or change branch in Netlify settings).
+Netlify (frontend) — deploy automático via GitHub Actions
+---------------------------------------------------------
 
-Workflow
-1. Push code to `main`.
-2. Render will auto-deploy the backend from `backend/` (see render.yaml). Fill env vars in Render dashboard first.
-3. Netlify will auto-deploy the frontend from `frontend/` (ensure branch matches).
+Cada **push em `main`** dispara o workflow `.github/workflows/netlify-deploy.yml`, que publica a pasta `frontend/` em produção.
+
+### Configuração única (obrigatória)
+
+1. **Token Netlify**  
+   - https://app.netlify.com/user/applications#personal-access-tokens  
+   - Create token → copie o valor.
+
+2. **Site ID**  
+   - https://app.netlify.com/sites/keephub/settings/general  
+   - Campo **Site ID** (ex.: `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`).
+
+3. **Secrets no GitHub** (repositório `infofieb/keephub`)  
+   - https://github.com/infofieb/keephub/settings/secrets/actions  
+   - **New repository secret**:
+     - `NETLIFY_AUTH_TOKEN` = token do passo 1
+     - `NETLIFY_SITE_ID` = Site ID do passo 2
+
+4. **Testar**  
+   - Faça push em `main` ou em Actions → **Deploy frontend to Netlify** → **Run workflow**.  
+   - Site: https://keephub.netlify.app
+
+### Ficheiros de configuração
+
+- `netlify.toml` — publish `frontend/`, proxy `/api/*` → Render, cache do PWA.
+- `frontend/_redirects` — fallback do proxy API (redundante com `netlify.toml`).
+
+### Netlify ligado ao Git (opcional)
+
+Se no painel Netlify o site já estiver ligado ao GitHub, pode haver **dois deploys** por push. Recomendação:
+
+- **Usar só GitHub Actions** (recomendado): em Netlify → *Site configuration* → *Build & deploy* → desative *Builds* ou desligue o repositório.
+- **Ou** usar só Netlify Git: apague/desative o workflow e ligue `infofieb/keephub`, branch `main`, publish directory `frontend`, build command vazio.
+
+Workflow geral
+1. Push para `main`.
+2. **Render** — auto-deploy do `backend/` (`render.yaml`).
+3. **Netlify** — GitHub Action publica `frontend/` (requer secrets acima).
 
 Troubleshooting
-- If `/api/*` returns 404 on Netlify: confirm `_redirects` exists in the published files and Netlify used the correct branch.
-- If Render returns DB connection errors: check env vars and SSL/port settings, then check Render logs.
+- Action falha com auth: confirme `NETLIFY_AUTH_TOKEN` e `NETLIFY_SITE_ID` nos secrets do GitHub.
+- Site mostra HTML antigo: Ctrl+Shift+R; confira deploy em https://app.netlify.com/sites/keephub/deploys
+- `/api/*` 404: confirme `netlify.toml` e `_redirects` na pasta publicada.
+- Render DB errors: variáveis de ambiente e SSL no dashboard Render.
