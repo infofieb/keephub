@@ -21,33 +21,34 @@
             navigator.serviceWorker.register('sw.js');
         }
     </script>
-
-    <style type="text/tailwindcss">
-        @layer base {
-            body.dark {
-                @apply bg-keepdark text-slate-200;
-            }
-            .dark .bg-white {
-                @apply !bg-slate-800;
-            }
-            .dark .text-keepdark {
-                @apply !text-white;
-            }
-            .dark .text-slate-500 {
-                @apply !text-slate-300;
-            }
-            .dark .border-slate-100, .dark .border-slate-200 {
-                @apply !border-slate-700;
-            }
-            .dark input, .dark select, .dark textarea {
-                @apply !bg-slate-700 !text-white !border-slate-600;
-            }
-            .dark header.bg-white\\/95 {
-                @apply !bg-keepdark/95;
-            }
-            .dark footer.bg-white\\/95 {
-                @apply !bg-keepdark/95 !border-slate-800;
-            }
+    <style>
+        body.dark {
+            background-color: #111827;
+            color: #e2e8f0;
+        }
+        .dark .bg-white {
+            background-color: #1e293b !important;
+        }
+        .dark .text-keepdark {
+            color: #ffffff !important;
+        }
+        .dark .text-slate-500 {
+            color: #cbd5e1 !important;
+        }
+        .dark .border-slate-100, .dark .border-slate-200 {
+            border-color: #334155 !important;
+        }
+        .dark input, .dark select, .dark textarea {
+            background-color: #334155 !important;
+            color: #ffffff !important;
+            border-color: #475569 !important;
+        }
+        .dark header.bg-white\/95 {
+            background-color: rgba(17, 24, 39, 0.95) !important;
+        }
+        .dark footer.bg-white\/95 {
+            background-color: rgba(17, 24, 39, 0.95) !important;
+            border-color: #1e293b !important;
         }
     </style>
 

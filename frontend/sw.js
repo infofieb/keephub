@@ -1,7 +1,7 @@
 self.addEventListener('install', (e) => {
   self.skipWaiting();
   e.waitUntil(
-    caches.open('keephub-v5').then((cache) => cache.addAll(['/index.html', '/manifest.json']))
+    caches.open('keephub-v6').then((cache) => cache.addAll(['/index.html', '/manifest.json']))
   );
 });
 
