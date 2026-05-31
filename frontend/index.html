@@ -647,6 +647,12 @@
                         <div id="btn-theme-circle" class="w-4 h-4 bg-white rounded-full absolute left-1 transition-transform transform shadow-sm"></div>
                     </button>
                 </div>
+                <div id="container-install-pwa" class="mt-4 border-t border-white/10 pt-4 w-full max-w-[200px] flex justify-between items-center relative z-10 escondido">
+                    <span class="text-sm font-semibold text-slate-300">Instalar App</span>
+                    <button onclick="instalarPWA()" class="px-3 py-1.5 bg-huborange text-white rounded-xl text-xs font-bold hover:bg-orange-600 transition-colors shadow-sm">
+                        Instalar
+                    </button>
+                </div>
             </article>
         </section>
     </main>
@@ -914,6 +920,26 @@
         let dadosApp = { financas: [], metas: [], despensa: [], medicamentos: [], pets: [] };
         let telaAtual = 'tela-hub';
         let isModoOffline = false;
+        let pwaDeferredPrompt;
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            pwaDeferredPrompt = e;
+            const btnContainer = document.getElementById('container-install-pwa');
+            if (btnContainer) btnContainer.classList.remove('escondido');
+        });
+
+        async function instalarPWA() {
+            if (pwaDeferredPrompt) {
+                pwaDeferredPrompt.prompt();
+                const { outcome } = await pwaDeferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    const btnContainer = document.getElementById('container-install-pwa');
+                    if (btnContainer) btnContainer.classList.add('escondido');
+                }
+                pwaDeferredPrompt = null;
+            }
+        }
         let usuarioLogado = null;
 
         // TEMA CLARO/ESCURO
