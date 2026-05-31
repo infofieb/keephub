@@ -15,10 +15,21 @@ Render (backend)
 
 Notes: do NOT store secrets in the repo. Leave values empty in `render.yaml` and set them in Render's dashboard.
 
-Netlify (frontend) — deploy automático via GitHub Actions
----------------------------------------------------------
+Netlify (frontend) — deploy automático via Git
+----------------------------------------------
 
-Cada **push em `main`** dispara o workflow `.github/workflows/netlify-deploy.yml`, que publica a pasta `frontend/` em produção.
+O site **keephub.netlify.app** publica a branch **`deploy-clean`** (não `main`).
+
+Após alterar o frontend, faça push de `main` **e** atualize `deploy-clean`:
+
+```bash
+git checkout deploy-clean
+git merge main
+git push origin deploy-clean
+git checkout main
+```
+
+Opcional: o workflow `.github/workflows/netlify-deploy.yml` também pode publicar a partir de `main` se os secrets estiverem configurados.
 
 ### Configuração única (obrigatória)
 

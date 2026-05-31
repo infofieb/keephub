@@ -9,9 +9,10 @@ Quando concluir uma tarefa que alterou código do KeepHub:
 
 1. Confirme que as alterações estão prontas (sem secrets em ficheiros commitados).
 2. Faça commit e push para `main` em `https://github.com/infofieb/keephub.git`.
-3. Verifique o deploy:
-   - **Render**: auto-deploy via `render.yaml` (root `backend/`)
-   - **Netlify**: GitHub Action `.github/workflows/netlify-deploy.yml` (requer secrets `NETLIFY_AUTH_TOKEN` e `NETLIFY_SITE_ID` no repositório — ver `README_DEPLOY.md`)
+3. Atualize também a branch **`deploy-clean`** (produção Netlify): `git checkout deploy-clean && git merge main && git push origin deploy-clean && git checkout main`
+4. Verifique o deploy:
+   - **Render**: auto-deploy via `render.yaml` (branch `main`, root `backend/`)
+   - **Netlify**: auto-deploy via Git na branch `deploy-clean` (publish `frontend/`). Opcional: GitHub Action se secrets estiverem configurados.
 4. Informe o utilizador quando o push foi feito e que os deploys foram disparados.
 
 Não deixar tarefas “concluídas” apenas no disco local se o objetivo era entregar em produção.
