@@ -1,4 +1,4 @@
-const CACHE_NAME = 'keephub-v14';
+const CACHE_NAME = 'keephub-v15';
 
 self.addEventListener('install', (e) => {
   self.skipWaiting();

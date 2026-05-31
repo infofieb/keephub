@@ -1404,14 +1404,26 @@
                 return mesAno === filtroVal;
             });
 
+            let saldoGlobal = 0;
+            dadosApp.financas.forEach(item => {
+                const isDespesa = item.tipo === 'despesa'; 
+                const valorF = parseFloat(item.valor);
+                const status = item.status || 'pago';
+                if (status === 'pago') {
+                    saldoGlobal += isDespesa ? -valorF : valorF;
+                }
+            });
+
             [...financasFiltradas].reverse().forEach(item => {
                 const isDespesa = item.tipo === 'despesa'; 
                 const valorF = parseFloat(item.valor);
                 const status = item.status || 'pago';
                 
-                if (status === 'pago') {
-                    saldo += isDespesa ? -valorF : valorF;
+                if (status !== 'pago') {
+                    if (isDespesa) totalDespesas += valorF;
+                    else totalReceitas += valorF;
                 } else {
+                    // Receitas e despesas pagas DO MÊS
                     if (isDespesa) totalDespesas += valorF;
                     else totalReceitas += valorF;
                 }
@@ -1435,7 +1447,7 @@
             const elReceitas = document.getElementById('total-receitas');
             const elDespesas = document.getElementById('total-despesas');
             
-            if (elSaldo) elSaldo.innerText = `R$ ${saldo.toFixed(2)}`;
+            if (elSaldo) elSaldo.innerText = saldoGlobal < 0 ? `-R$ ${Math.abs(saldoGlobal).toFixed(2)}` : `R$ ${saldoGlobal.toFixed(2)}`;
             if (elReceitas) elReceitas.innerText = `R$ ${totalReceitas.toFixed(2)}`;
             if (elDespesas) elDespesas.innerText = `R$ ${totalDespesas.toFixed(2)}`;
 
